@@ -73,29 +73,25 @@
      DO = 262,
      BEGIN_N = 263,
      END = 264,
-     ADD = 265,
-     SUB = 266,
-     MUL = 267,
-     DIV = 268,
-     GT = 269,
-     LT = 270,
-     EQ = 271,
-     GE = 272,
-     LE = 273,
-     NEQ = 274,
-     SLP = 275,
-     SRP = 276,
-     SEMI = 277,
-     KEY = 278,
-     SPACE_ENTER = 279,
-     UNDEFINE = 280,
-     DEC = 281,
-     HEX = 282,
-     OCT = 283,
-     ILHEX = 284,
-     ILOCT = 285,
-     IDN = 286,
-     END_OF_INPUT = 287
+     IDN = 265,
+     DEC = 266,
+     OCT = 267,
+     ILOCT = 268,
+     HEX = 269,
+     ILHEX = 270,
+     ADD = 271,
+     SUB = 272,
+     MUL = 273,
+     DIV = 274,
+     GT = 275,
+     LT = 276,
+     EQ = 277,
+     GE = 278,
+     LE = 279,
+     NEQ = 280,
+     SLP = 281,
+     SRP = 282,
+     SEMI = 283
    };
 #endif
 /* Tokens.  */
@@ -106,86 +102,179 @@
 #define DO 262
 #define BEGIN_N 263
 #define END 264
-#define ADD 265
-#define SUB 266
-#define MUL 267
-#define DIV 268
-#define GT 269
-#define LT 270
-#define EQ 271
-#define GE 272
-#define LE 273
-#define NEQ 274
-#define SLP 275
-#define SRP 276
-#define SEMI 277
-#define KEY 278
-#define SPACE_ENTER 279
-#define UNDEFINE 280
-#define DEC 281
-#define HEX 282
-#define OCT 283
-#define ILHEX 284
-#define ILOCT 285
-#define IDN 286
-#define END_OF_INPUT 287
+#define IDN 265
+#define DEC 266
+#define OCT 267
+#define ILOCT 268
+#define HEX 269
+#define ILHEX 270
+#define ADD 271
+#define SUB 272
+#define MUL 273
+#define DIV 274
+#define GT 275
+#define LT 276
+#define EQ 277
+#define GE 278
+#define LE 279
+#define NEQ 280
+#define SLP 281
+#define SRP 282
+#define SEMI 283
 
 
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "grammer.y"
+#line 2 "gram.y"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "y.tab.h"
-int yylex(void);
-void yyerror(char*);
+    #include "lex.yy.c"
+    #include <stdio.h>
+    #include <math.h>
+    #include <stdlib.h>
+    #include <sys/malloc.h>
+	#include <string.h>
+    #define YYERROR_VERBOSE 1
 
-
-typedef struct _syntax_tree_node{
-	    struct _syntax_tree_node * parent;
-	    struct _syntax_tree_node * children[10];
-	    int children_num;
-	    char name[1000];
-	} syntax_tree_node;
-
-    //create node
-	syntax_tree_node * create_new_node(){
-	    syntax_tree_node* node = new syntax_tree_node;
-        node->parent = NULL;
-        node->children = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-        node->children_num = 0;
-        node->name = "empty";
-        return node;
-	}
-
-	int add_child(syntax_tree_node* parent, syntax_tree_node* child){
-	    for (int i = 0; i < 10; i++){
-	        if (parent->children[i] == NULL){
-	            child->parent = parent;
-	            parent->children[i] = child;
-	            return i;
-	        }
-	    }
-	}
-
-	void del_node(syntax_tree_node* node, int recursive){
-        for (int i = 0; i < 10; i++){
-            if (node->children[i] != NULL){
-                void del_node(node->children[i], i);
-                node->children[i] = NULL;
-            }
+    //语法树的结构
+    typedef char* ElemType; 
+ 
+	int i;
+    typedef struct BiTNode{
+        ElemType data;
+        struct BiTNode *lChild, *mChild, *rChild, *l2Child, *m2Child, *r2Child;
+    }BiTNode, *BiTree;
+ 
+    typedef struct Node{
+        BiTNode *data;
+        struct Node *next;
+    }Node, *LinkedList;
+  void yyerror (char const *);
+//创建链表
+LinkedList LinkedListInit()    
+{    
+     Node *L;    
+     L = (Node *)malloc(sizeof(Node));
+	 
+     L->next = NULL;
+     return L;
+}
+ 
+//插入节点，头插法
+LinkedList LinkedListInsert(LinkedList L,BiTNode *x)    
+{    
+     Node *pre;
+     pre = L;
+     Node *p;
+     p = (Node *)malloc(sizeof(Node));    
+     p->data = x;     
+     p->next = pre->next;    
+     pre->next = p;    
+     return L;                               
+}
+void TreeDelete(BiTNode* treeNode){
+    if (treeNode != NULL){
+        TreeDelete(treeNode->lChild);
+        TreeDelete(treeNode->mChild);
+        TreeDelete(treeNode->rChild);
+        TreeDelete(treeNode->l2Child);
+        TreeDelete(treeNode->m2Child);
+        TreeDelete(treeNode->r2Child);
+        free(treeNode);
+        treeNode = NULL;
+    }
+}
+//new!
+LinkedList LinkedListDeleteTop(LinkedList L){
+    if(L != NULL){
+        Node *topNode = L->next;
+        if (topNode != NULL){
+            BiTNode* topTree = topNode->data;
+            
+            L->next = topNode->next;
+            TreeDelete(topNode->data);
+            free(topNode);
+            topNode = NULL;
         }
-        node->parent->children[recursive] = NULL;
-        delete node;
-	}
+    }
+    return L;
+    
+}
+ 
+//创建叶子
+BiTree createLeaf(ElemType root)
+{
+ 
+     BiTree T = (BiTree)malloc(sizeof(BiTNode));
+     if (T != NULL) {
+               T->data = root;
+               T->lChild = NULL;
+               T->mChild = NULL;
+               T->rChild = NULL;
+			  T->l2Child = NULL;
+               T->m2Child = NULL;
+               T->r2Child = NULL;
+     }
+     else exit(-1);
+     return T;
+}
+ 
+BiTree createTree(ElemType root, BiTree lleaf, BiTree mleaf, BiTree rleaf, 
+					BiTree l2leaf, BiTree m2leaf, BiTree r2leaf)
+{
+ 
+     BiTree T = (BiTree)malloc(sizeof(BiTNode));
+     if (T != NULL) {
+               T->data = root;
+               T->lChild = lleaf;
+               T->mChild = mleaf;
+               T->rChild = rleaf;
+               T->l2Child = l2leaf;
+               T->m2Child = m2leaf;
+               T->r2Child = r2leaf;
+     }
+     else exit(-1);
+     return T;
+}
+ 
+//后序遍历
+void TraverseBiTree(BiTree T)
+{
+     if (T == NULL) return ;
+     TraverseBiTree(T->lChild);
+     TraverseBiTree(T->mChild);
+     TraverseBiTree(T->rChild);
+	 TraverseBiTree(T->l2Child);
+     TraverseBiTree(T->m2Child);
+     TraverseBiTree(T->r2Child);
+     if(strcmp(T->data, " ") != 0) printf("%s ", T->data);
+}
+ 
+void Print6aryTree(BiTree root, int level) {
+    if (root == NULL) {
+        return;
+    }
 
-	typedef struct _syntax_tree{
-	    syntax_tree_node * root;
-	} syntax_tree;
+    // 如果字符串内容为空格，则不输出节点
+    if (strcmp(root->data, " ") != 0) {
+        printf("%*s%s\n", level * 4, "", root->data);
+    }
 
+    Print6aryTree(root->lChild, level + 1);
+    Print6aryTree(root->mChild, level + 1);
+    Print6aryTree(root->rChild, level + 1);
+    Print6aryTree(root->l2Child, level + 1);
+    Print6aryTree(root->m2Child, level + 1);
+    Print6aryTree(root->r2Child, level + 1);
+}
+ 
+//变量的申明，全局变量必须赋初值
+    LinkedList list;
+	//LinkedList list = NULL;
+    //LinkedList head = NULL;
+	LinkedList head ;
+    BiTree T, T1, T2, T3,T4,T5,T6;
+    
 
 
 /* Enabling traces.  */
@@ -219,7 +308,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 223 "y.tab.c"
+#line 312 "gram.tab.c"
 
 #ifdef short
 # undef short
@@ -432,22 +521,22 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  18
+#define YYFINAL  19
 /* YYLAST -- Last index in YYTABLE.  */
 #define YYLAST   45
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  33
+#define YYNTOKENS  29
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  8
+#define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  25
+#define YYNRULES  26
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  50
+#define YYNSTATES  51
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   287
+#define YYMAXUTOK   283
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -483,7 +572,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32
+      25,    26,    27,    28
 };
 
 #if YYDEBUG
@@ -491,31 +580,31 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     5,     8,    11,    15,    20,    27,    32,
-      36,    40,    44,    48,    52,    56,    60,    64,    66,    70,
-      74,    76,    80,    82,    84,    86
+       0,     0,     3,     5,     7,    10,    13,    17,    22,    29,
+      34,    38,    42,    46,    50,    54,    58,    62,    66,    68,
+      72,    76,    78,    82,    84,    86,    88
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      34,     0,    -1,    35,    -1,    35,    34,    -1,    36,    22,
-      -1,    31,    16,    38,    -1,     3,    37,     4,    36,    -1,
-       3,    37,     4,    36,     5,    36,    -1,     6,    37,     7,
-      36,    -1,    38,    14,    38,    -1,    38,    15,    38,    -1,
-      38,    16,    38,    -1,    38,    17,    38,    -1,    38,    18,
-      38,    -1,    38,    19,    38,    -1,    38,    10,    39,    -1,
-      38,    11,    39,    -1,    39,    -1,    39,    12,    40,    -1,
-      39,    13,    40,    -1,    40,    -1,    20,    38,    21,    -1,
-      31,    -1,    28,    -1,    26,    -1,    27,    -1
+      30,     0,    -1,    31,    -1,    32,    -1,    32,    31,    -1,
+      33,    28,    -1,    10,    22,    35,    -1,     3,    34,     4,
+      33,    -1,     3,    34,     4,    33,     5,    33,    -1,     6,
+      34,     7,    33,    -1,    35,    20,    35,    -1,    35,    21,
+      35,    -1,    35,    22,    35,    -1,    35,    23,    35,    -1,
+      35,    24,    35,    -1,    35,    25,    35,    -1,    35,    16,
+      36,    -1,    35,    17,    36,    -1,    36,    -1,    36,    18,
+      37,    -1,    36,    19,    37,    -1,    37,    -1,    26,    35,
+      27,    -1,    10,    -1,    12,    -1,    11,    -1,    14,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    89,    89,    90,    93,    96,    97,    98,    99,   102,
-     103,   104,   105,   106,   107,   110,   111,   112,   115,   116,
-     117,   120,   121,   122,   123,   124
+       0,   183,   183,   190,   204,   217,   239,   252,   264,   277,
+     290,   302,   314,   326,   338,   350,   363,   375,   388,   402,
+     414,   426,   440,   453,   463,   473,   483
 };
 #endif
 
@@ -525,10 +614,9 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "IF", "THEN", "ELSE", "WHILE", "DO",
-  "BEGIN_N", "END", "ADD", "SUB", "MUL", "DIV", "GT", "LT", "EQ", "GE",
-  "LE", "NEQ", "SLP", "SRP", "SEMI", "KEY", "SPACE_ENTER", "UNDEFINE",
-  "DEC", "HEX", "OCT", "ILHEX", "ILOCT", "IDN", "END_OF_INPUT", "$accept",
-  "P", "L", "S", "C", "E", "T", "F", 0
+  "BEGIN_N", "END", "IDN", "DEC", "OCT", "ILOCT", "HEX", "ILHEX", "ADD",
+  "SUB", "MUL", "DIV", "GT", "LT", "EQ", "GE", "LE", "NEQ", "SLP", "SRP",
+  "SEMI", "$accept", "P1", "P", "L", "S", "C", "E", "T", "F", 0
 };
 #endif
 
@@ -539,25 +627,24 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,   287
+     275,   276,   277,   278,   279,   280,   281,   282,   283
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    33,    34,    34,    35,    36,    36,    36,    36,    37,
-      37,    37,    37,    37,    37,    38,    38,    38,    39,    39,
-      39,    40,    40,    40,    40,    40
+       0,    29,    30,    31,    31,    32,    33,    33,    33,    33,
+      34,    34,    34,    34,    34,    34,    35,    35,    35,    36,
+      36,    36,    37,    37,    37,    37,    37
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     2,     2,     3,     4,     6,     4,     3,
-       3,     3,     3,     3,     3,     3,     3,     1,     3,     3,
-       1,     3,     1,     1,     1,     1
+       0,     2,     1,     1,     2,     2,     3,     4,     6,     4,
+       3,     3,     3,     3,     3,     3,     3,     3,     1,     3,
+       3,     1,     3,     1,     1,     1,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -565,35 +652,37 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     2,     0,     0,    24,    25,
-      23,    22,     0,     0,    17,    20,     0,     0,     1,     3,
-       4,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     5,    21,     6,    15,    16,     9,
-      10,    11,    12,    13,    14,    18,    19,     8,     0,     7
+       0,     0,     0,     0,     0,     2,     3,     0,    23,    25,
+      24,    26,     0,     0,     0,    18,    21,     0,     0,     1,
+       4,     5,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     6,    22,     7,    16,    17,
+      10,    11,    12,    13,    14,    15,    19,    20,     9,     0,
+       8
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5,     6,    12,    13,    14,    15
+      -1,     4,     5,     6,     7,    13,    14,    15,    16
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -22
+#define YYPACT_NINF -24
 static const yytype_int8 yypact[] =
 {
-      -3,   -18,   -18,    -2,    16,    -3,     2,   -18,   -22,   -22,
-     -22,   -22,    21,    25,     5,   -22,    19,   -18,   -22,   -22,
-     -22,    -6,    -3,   -18,   -18,   -18,   -18,   -18,   -18,   -18,
-     -18,   -18,   -18,    -3,    -4,   -22,    32,     5,     5,    -4,
-      -4,    -4,    -4,    -4,    -4,   -22,   -22,   -22,    -3,   -22
+      19,    -2,    -2,   -18,    14,   -24,    19,    -7,   -24,   -24,
+     -24,   -24,    -2,    26,    11,   -13,   -24,    16,    -2,   -24,
+     -24,   -24,   -14,    19,    -2,    -2,    -2,    -2,    -2,    -2,
+      -2,    -2,    -2,    -2,    19,    21,   -24,    38,   -13,   -13,
+      21,    21,    21,    21,    21,    21,   -24,   -24,   -24,    19,
+     -24
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -22,    33,   -22,   -21,    43,     4,    -1,   -12
+     -24,   -24,    39,   -24,   -23,    42,   -11,    15,     9
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -603,31 +692,32 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       1,    36,     7,     2,    23,    24,    23,    24,     8,     9,
-      10,    21,    47,    11,    17,    35,    18,    31,    32,    45,
-      46,    34,    37,    38,    20,    22,    33,    49,     3,    39,
-      40,    41,    42,    43,    44,    23,    24,    48,    19,    25,
-      26,    27,    28,    29,    30,    16
+      37,    22,    24,    25,    18,    32,    33,    35,     8,     9,
+      10,    48,    11,    36,    19,    40,    41,    42,    43,    44,
+      45,    21,     1,    34,    12,     2,    50,    24,    25,     3,
+      23,    26,    27,    28,    29,    30,    31,    24,    25,    38,
+      39,    46,    47,    49,    17,    20
 };
 
 static const yytype_uint8 yycheck[] =
 {
-       3,    22,    20,     6,    10,    11,    10,    11,    26,    27,
-      28,     7,    33,    31,    16,    21,     0,    12,    13,    31,
-      32,    17,    23,    24,    22,     4,     7,    48,    31,    25,
-      26,    27,    28,    29,    30,    10,    11,     5,     5,    14,
-      15,    16,    17,    18,    19,     2
+      23,    12,    16,    17,    22,    18,    19,    18,    10,    11,
+      12,    34,    14,    27,     0,    26,    27,    28,    29,    30,
+      31,    28,     3,     7,    26,     6,    49,    16,    17,    10,
+       4,    20,    21,    22,    23,    24,    25,    16,    17,    24,
+      25,    32,    33,     5,     2,     6
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     6,    31,    34,    35,    36,    20,    26,    27,
-      28,    31,    37,    38,    39,    40,    37,    16,     0,    34,
-      22,    38,     4,    10,    11,    14,    15,    16,    17,    18,
-      19,    12,    13,     7,    38,    21,    36,    39,    39,    38,
-      38,    38,    38,    38,    38,    40,    40,    36,     5,    36
+       0,     3,     6,    10,    30,    31,    32,    33,    10,    11,
+      12,    14,    26,    34,    35,    36,    37,    34,    22,     0,
+      31,    28,    35,     4,    16,    17,    20,    21,    22,    23,
+      24,    25,    18,    19,     7,    35,    27,    33,    36,    36,
+      35,    35,    35,    35,    35,    35,    37,    37,    33,     5,
+      33
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1441,14 +1531,386 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 4:
-#line 93 "grammer.y"
-    {printf("correct!\n");}
+        case 2:
+#line 183 "gram.y"
+    {
+                  head = list->next;
+                  T = head->data;
+                  Print6aryTree(T, 0);
+                  printf("\n");
+    ;}
+    break;
+
+  case 3:
+#line 190 "gram.y"
+    { 		  
+                  head = list->next;
+
+				  T1  = head->data;
+				  T2 = createLeaf(" ");
+                  T3 = createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("P", T1, T2, T3,T4,T5,T6);
+                  list->next = head->next;
+                  LinkedListInsert(list, T);   
+                ;}
+    break;
+
+  case 4:
+#line 204 "gram.y"
+    { 		  
+                  head = list->next;
+				  T1  = (head->next)->data;
+				  T2 = head->data;
+                  T3 = createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("P", T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                  LinkedListInsert(list, T);   ;}
+    break;
+
+  case 5:
+#line 217 "gram.y"
+    { head = list->next;
+                  T1 = head->data;
+
+                  //改了这里
+                  T2 = createLeaf(";");
+                  T3 = createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("L", T1, T2, T3, T4, T5, T6);
+                  list->next = head->next;
+                  //LinkedListDeleteTop(list);
+                  LinkedListInsert(list, T);
+
+                //   printf("Traverse BiTree:\n");
+                  
+				//   Print6aryTree(T, 0);
+				//   printf("\n");
+				
+				;}
+    break;
+
+  case 6:
+#line 239 "gram.y"
+    { 		//printf("S->IDN = E\n");  
+                  head = list->next;
+				  T1 = createLeaf("ID");
+				  T2 = createLeaf("=");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("S", T1, T2, T3,T4,T5,T6);
+                  list->next = head->next;
+                  //LinkedListDeleteTop(list);
+                  LinkedListInsert(list, T);   ;}
+    break;
+
+  case 7:
+#line 252 "gram.y"
+    { 		//printf("S->IF C THEN S\n");  
+                  head = list->next;
+				  T1 = createLeaf("IF");
+				  T2 = (head->next)->data;
+                  T3 = createLeaf("THEN");
+				  T4 = head->data;
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("S",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;//pop expel E
+                  LinkedListInsert(list, T);   ;}
+    break;
+
+  case 8:
+#line 264 "gram.y"
+    { 		//printf("S->IF C THEN S ELSE S\n");  
+                  head = list->next;
+				  T1 = createLeaf("IF");
+				  T2 = (head->next->next)->data;
+                  T3 = createLeaf("THEN");
+				  T4 = (head->next)->data;
+				  T5 = createLeaf("ELSE");
+				  T6 = head->data;
+                  T = createTree("S",T1, T2, T3,T4,T5,T6);
+                  list->next = ((head->next)->next)->next;
+                  LinkedListInsert(list, T);   ;}
+    break;
+
+  case 9:
+#line 277 "gram.y"
+    { 		//printf("S->WHILE C DO S\n");  
+                  head = list->next;
+				  T1 = createLeaf("WHILE");
+				  T2 = (head->next)->data;
+                  T3 = createLeaf("DO");
+				  T4 = head->data;
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("S",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                  LinkedListInsert(list, T);   ;}
+    break;
+
+  case 10:
+#line 290 "gram.y"
+    { //printf("C->E>E\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf(">");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("C", T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                  LinkedListInsert(list, T);  ;}
+    break;
+
+  case 11:
+#line 302 "gram.y"
+    { //printf("C->E<E\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("<");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("C", T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                  LinkedListInsert(list, T);   ;}
+    break;
+
+  case 12:
+#line 314 "gram.y"
+    { //printf("C->E=E\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("=");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("C",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                  LinkedListInsert(list, T);  ;}
+    break;
+
+  case 13:
+#line 326 "gram.y"
+    { //printf("C->E>=E\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("=");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("C",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);  ;}
+    break;
+
+  case 14:
+#line 338 "gram.y"
+    { //printf("C->E<=E\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("<=");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("C",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 15:
+#line 350 "gram.y"
+    { //printf("C->E!=E\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("!=");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("C",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 16:
+#line 363 "gram.y"
+    { //printf("E->E+T\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("+");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("E",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 17:
+#line 375 "gram.y"
+    { //printf("E->E-T\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("-");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("E",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 18:
+#line 388 "gram.y"
+    { //printf("T\n");  
+                  head = list->next;
+                  T1 = head->data;
+                  T2 = createLeaf(" ");
+                  T3 =  createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("E",T1, T2, T3,T4,T5,T6);
+                  list->next = head->next;
+                  //LinkedListDeleteTop(list);
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 19:
+#line 402 "gram.y"
+    { //printf("T->T*F\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("*");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("T",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 20:
+#line 414 "gram.y"
+    { //printf("T->T/F\n");  
+                  head = list->next;
+                  T1 = (head->next)->data;
+                  T2 = createLeaf("/");
+                  T3 = head->data;
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("T",T1, T2, T3,T4,T5,T6);
+                  list->next = (head->next)->next;
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 21:
+#line 426 "gram.y"
+    { //printf("T->F\n");  
+                  head = list->next;
+                  T1 = head->data;
+                  T2 = createLeaf(" ");
+                  T3 =  createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("T",T1, T2, T3,T4,T5,T6);
+                  list->next = head->next;
+                  //LinkedListDeleteTop(list);
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 22:
+#line 440 "gram.y"
+    { //printf("F->'('E')'\n");  
+                  head = list->next;
+                  T1 = createLeaf("(");
+                  T2 = head->data;
+                  T3 = createLeaf(")");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("F",T1, T2, T3,T4,T5,T6);
+                  list->next = head->next;
+                  //LinkedListDeleteTop(list);
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 23:
+#line 453 "gram.y"
+    { //printf("IDN\n");  
+                  T1 = createLeaf("ID");
+                  T2 = createLeaf(" ");
+                  T3 =  createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("F",T1, T2, T3,T4,T5,T6);
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 24:
+#line 463 "gram.y"
+    { //printf("OCT\n");  
+                  T1 = createLeaf("OCT");
+                  T2 = createLeaf(" ");
+                  T3 =  createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("F",T1, T2, T3,T4,T5,T6);
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 25:
+#line 473 "gram.y"
+    { //printf("DEC\n");  
+                  T1 = createLeaf("DEC");
+                  T2 = createLeaf(" ");
+                  T3 =  createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("F",T1, T2, T3,T4,T5,T6);
+                 LinkedListInsert(list, T);   ;}
+    break;
+
+  case 26:
+#line 483 "gram.y"
+    { //printf("HEX\n");  
+                  T1 = createLeaf("HEX");
+                  T2 = createLeaf(" ");
+                  T3 =  createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("F",T1, T2, T3,T4,T5,T6);
+                 LinkedListInsert(list, T);   ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1452 "y.tab.c"
+#line 1914 "gram.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1662,18 +2124,54 @@ yyreturn:
 }
 
 
-#line 126 "grammer.y"
+#line 493 "gram.y"
 
 
 int main() {
+	list = LinkedListInit();
+	head = NULL;
+    T=NULL, T1=NULL, T2=NULL, T3=NULL,T4=NULL,T5=NULL,T6=NULL;
+    char filePathName[1024] = { 0 };
+	freopen("result.txt", "wt+", stdout);
+
+    //打开文件
+    yyin = fopen("test.txt","r");
+    //yyin = fopen("wrong_test.txt", "r");
+    
+
+    //fflush(stdout);
+    // while(1){
+        
+    //     scanf("%s",filePathName);
+    //     FILE* fp = fopen(filePathName, "r");
+
+    //     if (fp ==  NULL){
+    //         printf("Wrong file path! Please enter again\n");
+    //     }
+    //     else {
+    //         yyin = fp;
+    //         break;
+    //     }
+        
+    // }
     yyparse();
+  
+//关闭文件
+    fclose(stdout);
+	
+	 
+    //yyparse();
+	//while(1);
     return 0;
-}
-int yywrap(){
-	return 1;
+	
 }
 
-void yyerror(char* msg) {
-    printf("Syntax error: %s\n", msg);
+
+
+void yyerror (char const *s)
+{
+  //fprintf (stderr, "%s\n", s);
+  fprintf(stderr, "Error : %s at line %d \n", s, yylineno); 
+  //fprintf(stderr, "%c\n", yychar);
 }
 

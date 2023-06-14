@@ -1,0 +1,669 @@
+Terminals which are not used
+
+   BEGIN_N
+   END
+   ILOCT
+   ILHEX
+
+
+State 37 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: P1 $end
+
+    1 P1: P
+
+    2 P: L
+    3  | L P
+
+    4 L: S SEMI
+
+    5 S: IDN EQ E
+    6  | IF C THEN S
+    7  | IF C THEN S ELSE S
+    8  | WHILE C DO S
+
+    9 C: E GT E
+   10  | E LT E
+   11  | E EQ E
+   12  | E GE E
+   13  | E LE E
+   14  | E NEQ E
+
+   15 E: E ADD T
+   16  | E SUB T
+   17  | T
+
+   18 T: T MUL F
+   19  | T DIV F
+   20  | F
+
+   21 F: SLP E SRP
+   22  | IDN
+   23  | OCT
+   24  | DEC
+   25  | HEX
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+IF (258) 6 7
+THEN (259) 6 7
+ELSE (260) 7
+WHILE (261) 8
+DO (262) 8
+BEGIN_N (263)
+END (264)
+IDN (265) 5 22
+DEC (266) 24
+OCT (267) 23
+ILOCT (268)
+HEX (269) 25
+ILHEX (270)
+ADD (271) 15
+SUB (272) 16
+MUL (273) 18
+DIV (274) 19
+GT (275) 9
+LT (276) 10
+EQ (277) 5 11
+GE (278) 12
+LE (279) 13
+NEQ (280) 14
+SLP (281) 21
+SRP (282) 21
+SEMI (283) 4
+
+
+Nonterminals, with rules where they appear
+
+$accept (29)
+    on left: 0
+P1 (30)
+    on left: 1, on right: 0
+P (31)
+    on left: 2 3, on right: 1 3
+L (32)
+    on left: 4, on right: 2 3
+S (33)
+    on left: 5 6 7 8, on right: 4 6 7 8
+C (34)
+    on left: 9 10 11 12 13 14, on right: 6 7 8
+E (35)
+    on left: 15 16 17, on right: 5 9 10 11 12 13 14 15 16 21
+T (36)
+    on left: 18 19 20, on right: 15 16 17 18 19
+F (37)
+    on left: 21 22 23 24 25, on right: 18 19 20
+
+
+state 0
+
+    0 $accept: . P1 $end
+
+    IF     shift, and go to state 1
+    WHILE  shift, and go to state 2
+    IDN    shift, and go to state 3
+
+    P1  go to state 4
+    P   go to state 5
+    L   go to state 6
+    S   go to state 7
+
+
+state 1
+
+    6 S: IF . C THEN S
+    7  | IF . C THEN S ELSE S
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    C  go to state 13
+    E  go to state 14
+    T  go to state 15
+    F  go to state 16
+
+
+state 2
+
+    8 S: WHILE . C DO S
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    C  go to state 17
+    E  go to state 14
+    T  go to state 15
+    F  go to state 16
+
+
+state 3
+
+    5 S: IDN . EQ E
+
+    EQ  shift, and go to state 18
+
+
+state 4
+
+    0 $accept: P1 . $end
+
+    $end  shift, and go to state 19
+
+
+state 5
+
+    1 P1: P .
+
+    $default  reduce using rule 1 (P1)
+
+
+state 6
+
+    2 P: L .
+    3  | L . P
+
+    IF     shift, and go to state 1
+    WHILE  shift, and go to state 2
+    IDN    shift, and go to state 3
+
+    $default  reduce using rule 2 (P)
+
+    P  go to state 20
+    L  go to state 6
+    S  go to state 7
+
+
+state 7
+
+    4 L: S . SEMI
+
+    SEMI  shift, and go to state 21
+
+
+state 8
+
+   22 F: IDN .
+
+    $default  reduce using rule 22 (F)
+
+
+state 9
+
+   24 F: DEC .
+
+    $default  reduce using rule 24 (F)
+
+
+state 10
+
+   23 F: OCT .
+
+    $default  reduce using rule 23 (F)
+
+
+state 11
+
+   25 F: HEX .
+
+    $default  reduce using rule 25 (F)
+
+
+state 12
+
+   21 F: SLP . E SRP
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 22
+    T  go to state 15
+    F  go to state 16
+
+
+state 13
+
+    6 S: IF C . THEN S
+    7  | IF C . THEN S ELSE S
+
+    THEN  shift, and go to state 23
+
+
+state 14
+
+    9 C: E . GT E
+   10  | E . LT E
+   11  | E . EQ E
+   12  | E . GE E
+   13  | E . LE E
+   14  | E . NEQ E
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+    GT   shift, and go to state 26
+    LT   shift, and go to state 27
+    EQ   shift, and go to state 28
+    GE   shift, and go to state 29
+    LE   shift, and go to state 30
+    NEQ  shift, and go to state 31
+
+
+state 15
+
+   17 E: T .
+   18 T: T . MUL F
+   19  | T . DIV F
+
+    MUL  shift, and go to state 32
+    DIV  shift, and go to state 33
+
+    $default  reduce using rule 17 (E)
+
+
+state 16
+
+   20 T: F .
+
+    $default  reduce using rule 20 (T)
+
+
+state 17
+
+    8 S: WHILE C . DO S
+
+    DO  shift, and go to state 34
+
+
+state 18
+
+    5 S: IDN EQ . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 35
+    T  go to state 15
+    F  go to state 16
+
+
+state 19
+
+    0 $accept: P1 $end .
+
+    $default  accept
+
+
+state 20
+
+    3 P: L P .
+
+    $default  reduce using rule 3 (P)
+
+
+state 21
+
+    4 L: S SEMI .
+
+    $default  reduce using rule 4 (L)
+
+
+state 22
+
+   15 E: E . ADD T
+   16  | E . SUB T
+   21 F: SLP E . SRP
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+    SRP  shift, and go to state 36
+
+
+state 23
+
+    6 S: IF C THEN . S
+    7  | IF C THEN . S ELSE S
+
+    IF     shift, and go to state 1
+    WHILE  shift, and go to state 2
+    IDN    shift, and go to state 3
+
+    S  go to state 37
+
+
+state 24
+
+   15 E: E ADD . T
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    T  go to state 38
+    F  go to state 16
+
+
+state 25
+
+   16 E: E SUB . T
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    T  go to state 39
+    F  go to state 16
+
+
+state 26
+
+    9 C: E GT . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 40
+    T  go to state 15
+    F  go to state 16
+
+
+state 27
+
+   10 C: E LT . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 41
+    T  go to state 15
+    F  go to state 16
+
+
+state 28
+
+   11 C: E EQ . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 42
+    T  go to state 15
+    F  go to state 16
+
+
+state 29
+
+   12 C: E GE . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 43
+    T  go to state 15
+    F  go to state 16
+
+
+state 30
+
+   13 C: E LE . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 44
+    T  go to state 15
+    F  go to state 16
+
+
+state 31
+
+   14 C: E NEQ . E
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    E  go to state 45
+    T  go to state 15
+    F  go to state 16
+
+
+state 32
+
+   18 T: T MUL . F
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    F  go to state 46
+
+
+state 33
+
+   19 T: T DIV . F
+
+    IDN  shift, and go to state 8
+    DEC  shift, and go to state 9
+    OCT  shift, and go to state 10
+    HEX  shift, and go to state 11
+    SLP  shift, and go to state 12
+
+    F  go to state 47
+
+
+state 34
+
+    8 S: WHILE C DO . S
+
+    IF     shift, and go to state 1
+    WHILE  shift, and go to state 2
+    IDN    shift, and go to state 3
+
+    S  go to state 48
+
+
+state 35
+
+    5 S: IDN EQ E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 5 (S)
+
+
+state 36
+
+   21 F: SLP E SRP .
+
+    $default  reduce using rule 21 (F)
+
+
+state 37
+
+    6 S: IF C THEN S .
+    7  | IF C THEN S . ELSE S
+
+    ELSE  shift, and go to state 49
+
+    ELSE      [reduce using rule 6 (S)]
+    $default  reduce using rule 6 (S)
+
+
+state 38
+
+   15 E: E ADD T .
+   18 T: T . MUL F
+   19  | T . DIV F
+
+    MUL  shift, and go to state 32
+    DIV  shift, and go to state 33
+
+    $default  reduce using rule 15 (E)
+
+
+state 39
+
+   16 E: E SUB T .
+   18 T: T . MUL F
+   19  | T . DIV F
+
+    MUL  shift, and go to state 32
+    DIV  shift, and go to state 33
+
+    $default  reduce using rule 16 (E)
+
+
+state 40
+
+    9 C: E GT E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 9 (C)
+
+
+state 41
+
+   10 C: E LT E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 10 (C)
+
+
+state 42
+
+   11 C: E EQ E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 11 (C)
+
+
+state 43
+
+   12 C: E GE E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 12 (C)
+
+
+state 44
+
+   13 C: E LE E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 13 (C)
+
+
+state 45
+
+   14 C: E NEQ E .
+   15 E: E . ADD T
+   16  | E . SUB T
+
+    ADD  shift, and go to state 24
+    SUB  shift, and go to state 25
+
+    $default  reduce using rule 14 (C)
+
+
+state 46
+
+   18 T: T MUL F .
+
+    $default  reduce using rule 18 (T)
+
+
+state 47
+
+   19 T: T DIV F .
+
+    $default  reduce using rule 19 (T)
+
+
+state 48
+
+    8 S: WHILE C DO S .
+
+    $default  reduce using rule 8 (S)
+
+
+state 49
+
+    7 S: IF C THEN S ELSE . S
+
+    IF     shift, and go to state 1
+    WHILE  shift, and go to state 2
+    IDN    shift, and go to state 3
+
+    S  go to state 50
+
+
+state 50
+
+    7 S: IF C THEN S ELSE S .
+
+    $default  reduce using rule 7 (S)

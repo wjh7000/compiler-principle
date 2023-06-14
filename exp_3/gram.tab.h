@@ -46,7 +46,7 @@
      DO = 262,
      BEGIN_N = 263,
      END = 264,
-     IDN = 265,
+     ID = 265,
      DEC = 266,
      OCT = 267,
      ILOCT = 268,
@@ -56,15 +56,16 @@
      SUB = 272,
      MUL = 273,
      DIV = 274,
-     GT = 275,
-     LT = 276,
-     EQ = 277,
-     GE = 278,
-     LE = 279,
-     NEQ = 280,
-     SLP = 281,
-     SRP = 282,
-     SEMI = 283
+     LT = 275,
+     EQ = 276,
+     GE = 277,
+     LE = 278,
+     NEQ = 279,
+     SLP = 280,
+     SRP = 281,
+     SEMI = 282,
+     token = 283,
+     REL = 284
    };
 #endif
 /* Tokens.  */
@@ -75,7 +76,7 @@
 #define DO 262
 #define BEGIN_N 263
 #define END 264
-#define IDN 265
+#define ID 265
 #define DEC 266
 #define OCT 267
 #define ILOCT 268
@@ -85,15 +86,16 @@
 #define SUB 272
 #define MUL 273
 #define DIV 274
-#define GT 275
-#define LT 276
-#define EQ 277
-#define GE 278
-#define LE 279
-#define NEQ 280
-#define SLP 281
-#define SRP 282
-#define SEMI 283
+#define LT 275
+#define EQ 276
+#define GE 277
+#define LE 278
+#define NEQ 279
+#define SLP 280
+#define SRP 281
+#define SEMI 282
+#define token 283
+#define REL 284
 
 
 

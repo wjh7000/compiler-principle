@@ -5,6 +5,50 @@
 #include "y.tab.h"
 int yylex(void);
 void yyerror(char*);
+
+
+typedef struct _syntax_tree_node{
+	    struct _syntax_tree_node * parent;
+	    struct _syntax_tree_node * children[10];
+	    int children_num;
+	    char name[1000];
+	} syntax_tree_node;
+
+    //create node
+	syntax_tree_node * create_new_node(){
+	    syntax_tree_node* node = new syntax_tree_node;
+        node->parent = NULL;
+        node->children = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+        node->children_num = 0;
+        node->name = "empty";
+        return node;
+	}
+
+	int add_child(syntax_tree_node* parent, syntax_tree_node* child){
+	    for (int i = 0; i < 10; i++){
+	        if (parent->children[i] == NULL){
+	            child->parent = parent;
+	            parent->children[i] = child;
+	            return i;
+	        }
+	    }
+	}
+
+	void del_node(syntax_tree_node* node, int recursive){
+        for (int i = 0; i < 10; i++){
+            if (node->children[i] != NULL){
+                void del_node(node->children[i], i);
+                node->children[i] = NULL;
+            }
+        }
+        node->parent->children[recursive] = NULL;
+        delete node;
+	}
+
+	typedef struct _syntax_tree{
+	    syntax_tree_node * root;
+	} syntax_tree;
+
 %}
 
 	%token IF
@@ -37,6 +81,9 @@ void yyerror(char*);
 	%token ILOCT
 	%token IDN
 	%token END_OF_INPUT
+
+	
+
 
 %%
 P: L   

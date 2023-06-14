@@ -4,8 +4,10 @@
     #include <stdio.h>
     #include <math.h>
     #include <stdlib.h>
-    #include <malloc.h>
-	#include <String.h>
+    #include <sys/malloc.h>
+	#include <string.h>
+    #define YYERROR_VERBOSE 1
+
     //语法树的结构
     typedef char* ElemType; 
  
@@ -41,6 +43,34 @@ LinkedList LinkedListInsert(LinkedList L,BiTNode *x)
      p->next = pre->next;    
      pre->next = p;    
      return L;                               
+}
+void TreeDelete(BiTNode* treeNode){
+    if (treeNode != NULL){
+        TreeDelete(treeNode->lChild);
+        TreeDelete(treeNode->mChild);
+        TreeDelete(treeNode->rChild);
+        TreeDelete(treeNode->l2Child);
+        TreeDelete(treeNode->m2Child);
+        TreeDelete(treeNode->r2Child);
+        free(treeNode);
+        treeNode = NULL;
+    }
+}
+//new!
+LinkedList LinkedListDeleteTop(LinkedList L){
+    if(L != NULL){
+        Node *topNode = L->next;
+        if (topNode != NULL){
+            BiTNode* topTree = topNode->data;
+            
+            L->next = topNode->next;
+            TreeDelete(topNode->data);
+            free(topNode);
+            topNode = NULL;
+        }
+    }
+    return L;
+    
 }
  
 //创建叶子
@@ -146,11 +176,20 @@ void Print6aryTree(BiTree root, int level) {
 	%token SLP;
 	%token SRP;
 	%token SEMI;
+    
 
 
 %%
+P1: P{
+                  head = list->next;
+                  T = head->data;
+                  Print6aryTree(T, 0);
+                  printf("\n");
+    }
+
 P: L  { 		  
                   head = list->next;
+
 				  T1  = head->data;
 				  T2 = createLeaf(" ");
                   T3 = createLeaf(" ");
@@ -158,15 +197,9 @@ P: L  {
 				  T5 = createLeaf(" ");
 				  T6 = createLeaf(" ");
                   T = createTree("P", T1, T2, T3,T4,T5,T6);
-                //   T = head->data;
-                //   Print6aryTree(T, 0);
                   list->next = head->next;
-                  LinkedListInsert(list, T);  
-                //   Print6aryTree(T, 0);
-
-                  
-
-                   }
+                  LinkedListInsert(list, T);   
+                }
 				  
  | L P	 { 		  
                   head = list->next;
@@ -182,33 +215,30 @@ P: L  {
  ;   
 
 L: S SEMI  { head = list->next;
+                  T1 = head->data;
 
-                  //test
-                //   T1 = head->data;
-				//   T2 = createLeaf(";");
-                //   T3 = createLeaf(" ");
-				//   T4 = createLeaf(" ");
-				//   T5 = createLeaf(" ");
-				//   T6 = createLeaf(" ");
-                //   T = createTree("L", T1, T2, T3,T4,T5,T6);
-                //   list->next = (head->next);
-                //   LinkedListInsert(list, T);
-                  //test end 
+                  //改了这里
+                  T2 = createLeaf(";");
+                  T3 = createLeaf(" ");
+				  T4 = createLeaf(" ");
+				  T5 = createLeaf(" ");
+				  T6 = createLeaf(" ");
+                  T = createTree("L", T1, T2, T3, T4, T5, T6);
+                  list->next = head->next;
+                  //LinkedListDeleteTop(list);
+                  LinkedListInsert(list, T);
 
-
-
-                  T = head->data;
-
-                  printf("Traverse BiTree:\n");
+                //   printf("Traverse BiTree:\n");
                   
-				  Print6aryTree(T, 0);
-				  
+				//   Print6aryTree(T, 0);
+				//   printf("\n");
+				
 				}
  ;
 
 S: IDN EQ E	 { 		//printf("S->IDN = E\n");  
                   head = list->next;
-				  T1 = createLeaf("IDN");
+				  T1 = createLeaf("ID");
 				  T2 = createLeaf("=");
                   T3 = head->data;
 				  T4 = createLeaf(" ");
@@ -216,6 +246,7 @@ S: IDN EQ E	 { 		//printf("S->IDN = E\n");
 				  T6 = createLeaf(" ");
                   T = createTree("S", T1, T2, T3,T4,T5,T6);
                   list->next = head->next;
+                  //LinkedListDeleteTop(list);
                   LinkedListInsert(list, T);   }
 
  | IF C THEN S	{ 		//printf("S->IF C THEN S\n");  
@@ -364,6 +395,7 @@ E: E ADD T	{ //printf("E->E+T\n");
 				  T6 = createLeaf(" ");
                   T = createTree("E",T1, T2, T3,T4,T5,T6);
                   list->next = head->next;
+                  //LinkedListDeleteTop(list);
                  LinkedListInsert(list, T);   }
  ;
 
@@ -401,6 +433,7 @@ T: T MUL F	{ //printf("T->T*F\n");
 				  T6 = createLeaf(" ");
                   T = createTree("T",T1, T2, T3,T4,T5,T6);
                   list->next = head->next;
+                  //LinkedListDeleteTop(list);
                  LinkedListInsert(list, T);   }
  ;
 
@@ -414,10 +447,11 @@ F: SLP E SRP	{ //printf("F->'('E')'\n");
 				  T6 = createLeaf(" ");
                   T = createTree("F",T1, T2, T3,T4,T5,T6);
                   list->next = head->next;
+                  //LinkedListDeleteTop(list);
                  LinkedListInsert(list, T);   }
 				 
  | IDN			{ //printf("IDN\n");  
-                  T1 = createLeaf("IDN");
+                  T1 = createLeaf("ID");
                   T2 = createLeaf(" ");
                   T3 =  createLeaf(" ");
 				  T4 = createLeaf(" ");
@@ -461,9 +495,38 @@ F: SLP E SRP	{ //printf("F->'('E')'\n");
 int main() {
 	list = LinkedListInit();
 	head = NULL;
-     T=NULL, T1=NULL, T2=NULL, T3=NULL,T4=NULL,T5=NULL,T6=NULL;
+    T=NULL, T1=NULL, T2=NULL, T3=NULL,T4=NULL,T5=NULL,T6=NULL;
+    char filePathName[1024] = { 0 };
+	freopen("result.txt", "wt+", stdout);
+
+    //打开文件
+    yyin = fopen("test.txt","r");
+    //yyin = fopen("wrong_test.txt", "r");
+    
+
+    //fflush(stdout);
+    // while(1){
+        
+    //     scanf("%s",filePathName);
+    //     FILE* fp = fopen(filePathName, "r");
+
+    //     if (fp ==  NULL){
+    //         printf("Wrong file path! Please enter again\n");
+    //     }
+    //     else {
+    //         yyin = fp;
+    //         break;
+    //     }
+        
+    // }
     yyparse();
-	while(1);
+  
+//关闭文件
+    fclose(stdout);
+	
+	 
+    //yyparse();
+	//while(1);
     return 0;
 	
 }
@@ -472,5 +535,5 @@ int main() {
 
 void yyerror (char const *s)
 {
-  fprintf (stderr, "%s\n", s);
+  fprintf(stderr, "Error : %s at line %d \n", s, yylineno); 
 }
